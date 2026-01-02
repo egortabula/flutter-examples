@@ -1,0 +1,29 @@
+name: flutter_examples
+
+packages:
+  - examples/**
+
+scripts:
+  analyze:
+    run: flutter analyze
+    description: Run Flutter analysis for all packages
+
+  format:
+    run: flutter format .
+    description: Format all Dart files
+
+  test:
+    run: flutter test
+    description: Run tests for all packages
+
+  clean:
+    run: flutter clean
+    description: Clean all packages
+
+  pub:get:
+    run: flutter pub get
+    description: Get dependencies for all packages
+
+  pub:upgrade:
+    run: flutter pub upgrade
+    description: Upgrade dependencies for all packages

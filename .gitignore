@@ -1,0 +1,11 @@
+# Melos
+.melos_tool/
+melos_*.iml
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store

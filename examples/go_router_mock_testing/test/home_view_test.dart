@@ -1,0 +1,277 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router_mock_testing/home_view.dart';
+import 'package:mocktail/mocktail.dart';
+
+import 'helpers/mock_go_router_provider.dart';
+import 'mocks/mock_go_router.dart';
+
+void main() {
+  group('UI Tests', () {
+    testWidgets('should display home screen with all UI elements', (tester) async {
+      // Create a mock GoRouter instance
+      final mockGoRouter = MockGoRouter();
+
+      // Stub canPop to return false (no navigation history)
+      when(() => mockGoRouter.canPop()).thenReturn(false);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MockGoRouterProvider(
+            goRouter: mockGoRouter,
+            child: const HomeView(),
+          ),
+        ),
+      );
+
+      // Check app bar title
+      expect(find.text('GoRouter Testing Example'), findsOneWidget);
+
+      // Check info banner
+      expect(
+        find.text('To learn how to mock GoRouter for testing, check the /test folder'),
+        findsOneWidget,
+      );
+
+      // Check section headers
+      expect(find.text('Navigation Methods'), findsOneWidget);
+      expect(find.text('Stack Methods'), findsOneWidget);
+      expect(find.text('Generic Methods'), findsOneWidget);
+      expect(find.text('Replacement Methods'), findsOneWidget);
+
+      // Check navigation method cards
+      expect(find.text('go()'), findsOneWidget);
+      expect(find.text('goNamed()'), findsOneWidget);
+      expect(find.text('push()'), findsOneWidget);
+      expect(find.text('pushNamed()'), findsOneWidget);
+      expect(find.text('pop()'), findsOneWidget);
+      expect(find.text('push<bool>()'), findsOneWidget);
+      expect(find.text('pop<String>()'), findsOneWidget);
+      expect(find.text('pushReplacement()'), findsOneWidget);
+      expect(find.text('pushReplacementNamed()'), findsOneWidget);
+      expect(find.text('replace()'), findsOneWidget);
+      expect(find.text('replaceNamed()'), findsOneWidget);
+    });
+  });
+
+  group('Navigation Tests', () {
+    late MockGoRouter mockGoRouter;
+
+    setUp(() {
+      mockGoRouter = MockGoRouter();
+      // Stub canPop for all navigation tests
+      when(() => mockGoRouter.canPop()).thenReturn(true);
+    });
+
+    testWidgets('should call go() when tapped', (tester) async {
+      // Stub the method
+      when(() => mockGoRouter.go(any())).thenReturn(null);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MockGoRouterProvider(
+            goRouter: mockGoRouter,
+            child: const HomeView(),
+          ),
+        ),
+      );
+
+      // Find and tap the card
+      await tester.tap(find.text('go()'));
+      await tester.pumpAndSettle();
+
+      // Verify the method was called
+      verify(() => mockGoRouter.go('/details')).called(1);
+    });
+
+    testWidgets('should call goNamed() when tapped', (tester) async {
+      // Stub the method
+      when(() => mockGoRouter.goNamed(any())).thenReturn(null);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MockGoRouterProvider(
+            goRouter: mockGoRouter,
+            child: const HomeView(),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('goNamed()'));
+      await tester.pumpAndSettle();
+
+      verify(() => mockGoRouter.goNamed('details')).called(1);
+    });
+
+    testWidgets('should call push() when tapped', (tester) async {
+      // Stub the method
+      when(() => mockGoRouter.push(any())).thenAnswer((_) async => null);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MockGoRouterProvider(
+            goRouter: mockGoRouter,
+            child: const HomeView(),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('push()'));
+      await tester.pumpAndSettle();
+
+      verify(() => mockGoRouter.push('/details')).called(1);
+    });
+
+    testWidgets('should call pushNamed() when tapped', (tester) async {
+      // Stub the method
+      when(() => mockGoRouter.pushNamed(any())).thenAnswer((_) async => null);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MockGoRouterProvider(
+            goRouter: mockGoRouter,
+            child: const HomeView(),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('pushNamed()'));
+      await tester.pumpAndSettle();
+
+      verify(() => mockGoRouter.pushNamed('details')).called(1);
+    });
+
+    testWidgets('should call pop() when tapped and can pop', (tester) async {
+      // Stub the method
+      when(() => mockGoRouter.pop()).thenReturn(null);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MockGoRouterProvider(
+            goRouter: mockGoRouter,
+            child: const HomeView(),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('pop()'));
+      await tester.pumpAndSettle();
+
+      verify(() => mockGoRouter.pop()).called(1);
+    });
+
+    testWidgets('should call push<bool>() when tapped', (tester) async {
+      // Stub the method with generic type
+      when(() => mockGoRouter.push<bool>(any())).thenAnswer((_) async => null);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MockGoRouterProvider(
+            goRouter: mockGoRouter,
+            child: const HomeView(),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('push<bool>()'));
+      await tester.pumpAndSettle();
+
+      verify(() => mockGoRouter.push<bool>('/details')).called(1);
+    });
+
+    testWidgets('should call pop<String>() when tapped', (tester) async {
+      // Stub the method with generic type
+      when(() => mockGoRouter.pop<String>(any())).thenReturn(null);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MockGoRouterProvider(
+            goRouter: mockGoRouter,
+            child: const HomeView(),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('pop<String>()'));
+      await tester.pumpAndSettle();
+
+      verify(() => mockGoRouter.pop<String>('Result from Home')).called(1);
+    });
+
+    testWidgets('should call pushReplacement() when tapped', (tester) async {
+      // Stub the method
+      when(() => mockGoRouter.pushReplacement(any())).thenAnswer((_) async => null);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MockGoRouterProvider(
+            goRouter: mockGoRouter,
+            child: const HomeView(),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('pushReplacement()'));
+      await tester.pumpAndSettle();
+
+      verify(() => mockGoRouter.pushReplacement('/details')).called(1);
+    });
+
+    testWidgets('should call pushReplacementNamed() when tapped', (tester) async {
+      // Stub the method
+      when(() => mockGoRouter.pushReplacementNamed(any())).thenAnswer((_) async => null);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MockGoRouterProvider(
+            goRouter: mockGoRouter,
+            child: const HomeView(),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('pushReplacementNamed()'));
+      await tester.pumpAndSettle();
+
+      verify(() => mockGoRouter.pushReplacementNamed('details')).called(1);
+    });
+
+    testWidgets('should call replace() when tapped', (tester) async {
+      // Stub the method
+      when(() => mockGoRouter.replace(any())).thenAnswer((_) async => null);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MockGoRouterProvider(
+            goRouter: mockGoRouter,
+            child: const HomeView(),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('replace()'));
+      await tester.pumpAndSettle();
+
+      verify(() => mockGoRouter.replace('/details')).called(1);
+    });
+
+    testWidgets('should call replaceNamed() when tapped', (tester) async {
+      // Stub the method
+      when(() => mockGoRouter.replaceNamed(any())).thenAnswer((_) async => null);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MockGoRouterProvider(
+            goRouter: mockGoRouter,
+            child: const HomeView(),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('replaceNamed()'));
+      await tester.pumpAndSettle();
+
+      verify(() => mockGoRouter.replaceNamed('details')).called(1);
+    });
+  });
+}
