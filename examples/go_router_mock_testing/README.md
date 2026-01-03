@@ -1,5 +1,7 @@
 # go_router Mock Testing Example
 
+![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
+
 This example demonstrates how to mock `go_router` in Flutter widget tests without using `MaterialApp.router`.
 
 ## 📖 Article
